@@ -1,0 +1,6 @@
+[submodule "qr/private/zbar"]
+	path = qr/private/zbar
+	url = https://github.com/mchehab/zbar.git
+[submodule "qr/private/qrcodegenerator"]
+	path = qr/private/qrcodegenerator
+	url = https://github.com/nayuki/QR-Code-generator.git
