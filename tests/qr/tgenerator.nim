@@ -25,9 +25,9 @@ proc run() =
   suite "test QR generator":
     let
       bgc = newRGBA(0xff99cc33'u32) # ABGR
-      fnShort = "_test_zbar_nim_short_.png"
-      fnLong = "_test_zbar_nim_long_.png"
-      fnBGC = "_test_zbar_nim_bgc_.png"
+      fnShort = "res/_test_zbar_nim_short_.png"
+      fnLong = "res/_test_zbar_nim_long_.png"
+      fnBGC = "res/_test_zbar_nim_bgc_.png"
 
     test fmt"generate QR short: {fnShort}":
       const s = "testQR"

@@ -13,10 +13,10 @@ proc inQR(fpath: string, expectmsg: string): bool=
 proc run() =
   suite "test QR scanner":
     let
-      fnShort = "_test_zbar_nim_short_.png"
-      fnLong = "_test_zbar_nim_long_.png"
-      fnBGC = "_test_zbar_nim_bgc_.png"
-      fnMul = "_test_zbar_nim_mul_.png"
+      fnShort = "res/_test_zbar_nim_short_.png"
+      fnLong = "res/_test_zbar_nim_long_.png"
+      fnBGC = "res/_test_zbar_nim_bgc_.png"
+      fnMul = "res/_test_zbar_nim_mul_.png"
 
     test fmt"scan QR short: {fnShort}":
       const s = "testQR"
