@@ -85,10 +85,10 @@ int CscanQR(vector<string> *pvtyps, vector<string> *pvmsgs, CVVPT *pvvpts,
 #if DISP_INFO_ZBAR > 0
     fprintf(stdout, "location_size: %d\n", m);
 #endif
-    vector<CPT> vp; // into vp[m + i] when use push_back with construct vp(m);
+    pvvpts->push_back(vector<CPT>(m));
+    vector<CPT> &vp = pvvpts->at(pvvpts->size() - 1);
     for(int i = 0; i < m; ++i)
-      vp.push_back(CPT{it->get_location_x(i), it->get_location_y(i)});
-    pvvpts->push_back(vp);
+      vp[i] = CPT{it->get_location_x(i), it->get_location_y(i)};
   }
   return 0;
 }
