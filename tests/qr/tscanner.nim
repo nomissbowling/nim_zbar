@@ -5,31 +5,34 @@ import nim_zbar
 import ../../qr/private/[nimstdvector, nimstdstring]
 import strformat, strutils
 
-proc expand(vvpts: Vector[Vector[QRpoint]]): string=
-  var r = @[fmt"vvpts: {vvpts.size}"]
-  for it in vvpts.begin..<vvpts.end:
-    let vpts: Vector[QRpoint] = it[] # must assgin to accessing type
-    r.add(fmt" vpts: {vpts.size}")
-    for pt in vpts.begin..<vpts.end:
-      r.add(fmt"{$pt[]}")
+proc toStr(locs: seq[seq[QRpoint]]): string=
+  var r = @[fmt"locs: {locs.len}"]
+  for loc in locs:
+    r.add(fmt" loc: {loc.len}")
+    for pt in loc:
+      r.add($pt)
   result = r.join("\n")
+
+proc toSeq(loc: Vector[QRpoint]): seq[QRpoint]=
+  for it in loc.begin..<loc.end:
+    result.add(it[])
 
 proc inQR(fpath: string, expectmsg: string): bool=
   let qrd = scan(fpath)
   var
-    typs = newSeq[string](qrd.vtyps.size)
-    msgs = newSeq[string](qrd.vmsgs.size)
+    typs = newSeq[string](qrd.size)
+    msgs = newSeq[string](qrd.size)
+    locs = newSeq[seq[QRpoint]](qrd.size)
     k = 0
-  for it in qrd.vtyps.begin..<qrd.vtyps.end:
-    typs[k] = $it[].cStr
+  for it in qrd.begin..<qrd.end:
+    let detect: QRdetect = it[] # assign to accessing type
+    typs[k] = $detect.typ.cStr
     check(typs[k] == "QR-Code")
-    k += 1
-  k = 0
-  for it in qrd.vmsgs.begin..<qrd.vmsgs.end:
-    msgs[k] = $it[].cStr
+    msgs[k] = $detect.msg.cStr
+    locs[k] = detect.loc.toSeq
     k += 1
   if expectmsg.len > 0: check(msgs[0] == expectmsg)
-  else: echo fmt"test {fpath}:{'\n'}{typs}{'\n'}{msgs}{'\n'}{qrd.vvpts.expand}"
+  else: echo fmt"test {fpath}:{'\n'}{typs}{'\n'}{msgs}{'\n'}{locs.toStr}"
   result = true
 
 proc run() =

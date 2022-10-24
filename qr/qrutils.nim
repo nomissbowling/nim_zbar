@@ -9,9 +9,9 @@ type
 
 type
   QRdetect* = object
-    vtyps*: Vector[StdString]
-    vmsgs*: Vector[StdString]
-    vvpts*: Vector[Vector[QRpoint]]
+    typ*: StdString
+    msg*: StdString
+    loc*: Vector[QRpoint]
 
 type
   QRmap* = object

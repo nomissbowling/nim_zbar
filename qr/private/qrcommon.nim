@@ -6,7 +6,7 @@
 # git submodule add https://github.com/nayuki/QR-Code-generator.git qr/private/qrcodegenerator
 
 import repos
-import ../qrutils
+import ../qrutils, nimstdvector
 import strformat
 
 const reposdir = getReposDir # here
@@ -59,11 +59,10 @@ int CgenQR(char *buf, char *msg)
   return sz;
 }
 
-typedef struct {int x; int y;} CPT;
-typedef vector<CPT> CVPT;
-typedef vector<CVPT> CVVPT;
+typedef struct {int x; int y;} CQRPOINT;
+typedef struct {string typ; string msg; vector<CQRPOINT> loc;} CQRDETECT;
 
-int CscanQR(vector<string> *pvtyps, vector<string> *pvmsgs, CVVPT *pvvpts,
+int CscanQR(vector<CQRDETECT> *pvdetect,
   int ch, int w, int h, unsigned char *px)
 {
   zbar::Image q(w, h, "Y800", (unsigned char *)px, w * h);
@@ -76,19 +75,16 @@ int CscanQR(vector<string> *pvtyps, vector<string> *pvmsgs, CVVPT *pvvpts,
   for(SymbolIterator it = q.symbol_begin(); it != q.symbol_end(); ++it){
     string typ = it->get_type_name(); // can not use char *typ = *.c_str();
     string msg = it->get_data(); // can not use char *msg = *.c_str();
-#if DISP_INFO_ZBAR > 0
-    fprintf(stdout, "decoded [%s]\n symbol [%s]\n", typ.c_str(), msg.c_str());
-#endif
-    pvtyps->push_back(typ);
-    pvmsgs->push_back(msg);
     int m = it->get_location_size();
 #if DISP_INFO_ZBAR > 0
+    fprintf(stdout, "decoded [%s]\n symbol [%s]\n", typ.c_str(), msg.c_str());
     fprintf(stdout, "location_size: %d\n", m);
 #endif
-    pvvpts->push_back(vector<CPT>(m));
-    vector<CPT> &vp = pvvpts->at(pvvpts->size() - 1);
+    pvdetect->push_back(CQRDETECT{typ, msg, vector<CQRPOINT>(m)});
+    CQRDETECT &detect = pvdetect->at(pvdetect->size() - 1);
+    vector<CQRPOINT> &vp = detect.loc;
     for(int i = 0; i < m; ++i)
-      vp[i] = CPT{it->get_location_x(i), it->get_location_y(i)};
+      vp[i] = CQRPOINT{it->get_location_x(i), it->get_location_y(i)};
   }
   return 0;
 }
@@ -98,10 +94,10 @@ int CscanQR(vector<string> *pvtyps, vector<string> *pvmsgs, CVVPT *pvvpts,
 proc cgenQR(p: ptr char; msg: cstring): cint {.importcpp: "CgenQR(@)", nodecl.}
 # proc cgenQR(p: ptr char; msg: cstring): cint {.importcpp: "CgenQR(@)".} # OK
 
-proc cscanQR(pvtyps: pointer, pvmsgs: pointer, pvvpts: pointer,
+proc cscanQR(pvdetect: pointer,
   ch, w, h: cint; px: ptr uint8): cint
   {.importcpp: "CscanQR(@)", nodecl.}
-# proc cscanQR(pvtyps: pointer, pvmsgs: pointer, pvvpts: pointer,
+# proc cscanQR(pvdetect: pointer
 #   ch, w, h: cint; px: ptr uint8): cint
 #   {.importcpp: "CscanQR(@)".} # OK
 
@@ -109,8 +105,8 @@ proc genQR*(qr: var QRmap; msg: cstring): int=
   qr.sz = cgenQR(if qr.p.len == 0: nil else: qr.p[0].unsafeAddr, msg)
   result = qr.sz
 
-proc scanQR*(gr: QRimage; detect: var QRdetect): int=
+proc scanQR*(gr: QRimage; vdetect: var Vector[QRdetect]): int=
   # expects gr is a 1ch grayscale
   assert gr.ch == 1
-  result = cscanQR(detect.vtyps.addr, detect.vmsgs.addr, detect.vvpts.addr,
+  result = cscanQR(vdetect.addr,
     gr.ch.cint, gr.w.cint, gr.h.cint, gr.px[0].unsafeAddr)
