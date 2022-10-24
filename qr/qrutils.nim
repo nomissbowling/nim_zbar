@@ -2,14 +2,16 @@
 
 import stb_image/read as stbi
 import stb_image/write as stbiw
-import ./private/nimstdvector
+import ./private/[nimstdvector, nimstdstring]
+
+type
+  QRpoint* = tuple[x: cint, y: cint]
 
 type
   QRdetect* = object
-    num*: int # get number of detections on pass 1
-    lens*: seq[cint] # get lengths of each msgs on pass 2
-    msgs*: seq[seq[char]] # to hold managed pointers newSeq[char] before pass 3
-    vecmsgs*: Vector[ptr char] # get msgs on pass 3
+    vtyps*: Vector[StdString]
+    vmsgs*: Vector[StdString]
+    vvpts*: Vector[Vector[QRpoint]]
 
 type
   QRmap* = object

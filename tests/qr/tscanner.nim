@@ -2,12 +2,34 @@
 
 import unittest
 import nim_zbar
+import ../../qr/private/[nimstdvector, nimstdstring]
 import strformat, strutils
 
+proc expand(vvpts: Vector[Vector[QRpoint]]): string=
+  var r = @[fmt"vvpts: {vvpts.size}"]
+  for it in vvpts.begin..<vvpts.end:
+    let vpts: Vector[QRpoint] = it[] # must assgin to accessing type
+    r.add(fmt" vpts: {vpts.size}")
+    for pt in vpts.begin..<vpts.end:
+      r.add(fmt"{$pt[]}")
+  result = r.join("\n")
+
 proc inQR(fpath: string, expectmsg: string): bool=
-  let msgs = scan(fpath)
+  let qrd = scan(fpath)
+  var
+    typs = newSeq[string](qrd.vtyps.size)
+    msgs = newSeq[string](qrd.vmsgs.size)
+    k = 0
+  for it in qrd.vtyps.begin..<qrd.vtyps.end:
+    typs[k] = $it[].cStr
+    check(typs[k] == "QR-Code")
+    k += 1
+  k = 0
+  for it in qrd.vmsgs.begin..<qrd.vmsgs.end:
+    msgs[k] = $it[].cStr
+    k += 1
   if expectmsg.len > 0: check(msgs[0] == expectmsg)
-  else: echo fmt"test {fpath}:{'\n'}{msgs}"
+  else: echo fmt"test {fpath}:{'\n'}{typs}{'\n'}{msgs}{'\n'}{qrd.vvpts.expand}"
   result = true
 
 proc run() =
