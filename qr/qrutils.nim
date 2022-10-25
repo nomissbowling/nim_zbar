@@ -2,7 +2,7 @@
 
 import stb_image/read as stbi
 import stb_image/write as stbiw
-import ./private/[nimstdvector, nimstdstring]
+import stdnim
 
 type
   QRpoint* = tuple[x: cint, y: cint]
@@ -11,7 +11,7 @@ type
   QRdetect* = object
     typ*: StdString
     msg*: StdString
-    loc*: Vector[QRpoint]
+    loc*: StdVector[QRpoint]
 
 type
   QRmap* = object

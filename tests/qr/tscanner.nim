@@ -2,7 +2,7 @@
 
 import unittest
 import nim_zbar
-import ../../qr/private/[nimstdvector, nimstdstring]
+import stdnim
 import strformat, strutils
 
 proc toStr(locs: seq[seq[QRpoint]]): string=
@@ -13,7 +13,7 @@ proc toStr(locs: seq[seq[QRpoint]]): string=
       r.add($pt)
   result = r.join("\n")
 
-proc toSeq(loc: Vector[QRpoint]): seq[QRpoint]=
+proc toSeq(loc: StdVector[QRpoint]): seq[QRpoint]=
   for it in loc.begin..<loc.end:
     result.add(it[])
 

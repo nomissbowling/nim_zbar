@@ -9,7 +9,8 @@ skipDirs      = @["tests", "benchmarks", "htmldocs"]
 skipFiles     = @["_config.yml"]
 
 requires "nim >= 1.0.0",
-  "stb_image"
+  "stb_image",
+  "stdnim >= 0.0.1"
 
 proc configForTests() =
   --hints: off

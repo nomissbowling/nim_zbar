@@ -6,7 +6,8 @@
 # git submodule add https://github.com/nayuki/QR-Code-generator.git qr/private/qrcodegenerator
 
 import repos
-import ../qrutils, nimstdvector
+import ../qrutils
+import stdnim
 import strformat
 
 const reposdir = getReposDir # here
@@ -105,7 +106,7 @@ proc genQR*(qr: var QRmap; msg: cstring): int=
   qr.sz = cgenQR(if qr.p.len == 0: nil else: qr.p[0].unsafeAddr, msg)
   result = qr.sz
 
-proc scanQR*(gr: QRimage; vdetect: var Vector[QRdetect]): int=
+proc scanQR*(gr: QRimage; vdetect: var StdVector[QRdetect]): int=
   # expects gr is a 1ch grayscale
   assert gr.ch == 1
   result = cscanQR(vdetect.addr,
